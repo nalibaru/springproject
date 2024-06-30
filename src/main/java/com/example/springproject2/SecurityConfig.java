@@ -34,7 +34,7 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
-    @Bean
+     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
                 .authorizeExchange(exchanges -> exchanges
@@ -44,7 +44,6 @@ public class SecurityConfig {
                 .addFilterAt(jwtAuthenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION);
         return http.build();
     }
-
 
     @Bean
     public ReactiveAuthenticationManager authenticationManager() {
@@ -56,7 +55,7 @@ public class SecurityConfig {
     @Bean
     public ReactiveAuthenticationManager jwtAuthenticationManager() {
         return authentication -> {
-            String token = (String) authentication.getCredentials(); // Cast to string, should be safe now
+            String token = (String) authentication.getCredentials();
             try {
                 if (token != null && jwtUtil.validateToken(token, jwtUtil.extractUsername(token))) {
                     String username = jwtUtil.extractUsername(token);

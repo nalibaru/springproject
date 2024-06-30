@@ -31,18 +31,17 @@ public class CreateController {
     }
 
     @PostMapping("/adduser")
-    public Mono<ResponseEntity<String>> createUserForAuthorized(@RequestBody AuthRequest authRequest) {
-        return createUser(authRequest.getUsername(), authRequest.getPassword())
+    public Mono<ResponseEntity<String>> createUserForAuthorized(@RequestBody User user) {
+        return createUser(user)
                 .map(savedUser -> ResponseEntity.ok("User created successfully with ID: " + savedUser.getId()))
                 .defaultIfEmpty(ResponseEntity.badRequest().body("Failed to create user"));
     }
 
-    private Mono<User> createUser(String username, String rawPassword) {
-        String encodedPassword = passwordEncoder.encode(rawPassword);
-        User newUser = new User();
-        newUser.setUsername(username);
-        newUser.setPassword(encodedPassword);
-        return Mono.justOrEmpty(customUserDetailsService.save(newUser));
+
+    private Mono<User> createUser(User user) {
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+        return Mono.justOrEmpty(customUserDetailsService.save(user));
     }
 
     @GetMapping("/fetchuser")
@@ -70,4 +69,39 @@ public class CreateController {
         response.put("Hello", Hello);
         return response;
     }
+
+    @PostMapping("/editrequest")
+    public Map<String, Object> editRequestMethod(
+            @RequestHeader(name = "project-name", required = false) String projectName,
+            @RequestHeader(name = "Hello", required = false) String Hello,
+            @RequestHeader(name = "Authorization", required = false) String token,
+            @RequestHeader(name = "custom-api-header", required = false) String apiheader,@RequestBody String data) {
+
+        Map<String, Object> response = new HashMap<>();
+        if (token != null && token.startsWith("Bearer ")) {
+            String[] bearerToken = token.split(" ");
+            String username = jwtUtil.extractUsername(bearerToken[1]);
+            response.put("token", bearerToken[1]);
+        }
+        if(projectName == null || projectName.isEmpty())
+        {
+            projectName = "SpringBoot";
+        }
+        response.put("project-name", projectName);
+        response.put("Hello", Hello);
+        response.put("modified-data",data);
+        response.put("api-header",apiheader);
+        return response;
+    }
+
+    @PostMapping("/editresponse")
+    public User editResponseMethod(
+            @RequestHeader(name = "project-name", required = false) String projectName,
+            @RequestHeader(name = "Hello", required = false) String Hello,
+            @RequestHeader(name = "Authorization", required = false) String token,@RequestParam(name="username") String username) {
+            User user = customUserDetailsService.findByUsername(username);
+            return user;
+    }
+
+
 }
