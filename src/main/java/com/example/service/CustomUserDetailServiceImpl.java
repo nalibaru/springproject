@@ -29,4 +29,12 @@ public class CustomUserDetailServiceImpl implements CustomUserDetailsService {
        User user = userRepository.customFindMethod(username);
        return user;
     }
+
+    @Override
+    public User fetchUserBasedOnId(Long id) {
+        User user = userRepository.fetchUserBasedOnId(id);
+        return user;
+    }
+
+
 }

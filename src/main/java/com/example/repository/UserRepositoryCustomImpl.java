@@ -23,6 +23,14 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     }
 
     @Override
+    public User fetchUserBasedOnId(Long id) {
+        Query query = entityManager.createQuery("SELECT u FROM User u WHERE u.id = :id", User.class);
+        query.setParameter("id", id);
+        List<User> users = query.getResultList();
+        return users.isEmpty() ? null : users.get(0);
+    }
+
+    @Override
     public User save(User user) {
         if (user.getId() == null) {
             entityManager.persist(user);

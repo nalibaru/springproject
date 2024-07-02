@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class AuthenticationController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/authenticate")
-    public Mono<ResponseEntity<String>> authenticate(@RequestBody AuthRequest authRequest) {
+    public Mono<ResponseEntity<String>> authenticate(@RequestHeader(name="X-Username-filter") String username, @RequestBody AuthRequest authRequest) {
         logger.info("Authentication request received for username: {}", authRequest.getUsername());
         return userDetailsService.findByUsername(authRequest.getUsername())
                 .doOnNext(userDetails -> logger.debug("User found in DB: {}", authRequest.getUsername()))
@@ -50,6 +51,7 @@ public class AuthenticationController {
                     roles.add("Admin");
                     String token = jwtUtil.generateToken(userDetails.getUsername(),roles);
                     logger.info("Generated JWT token for user: {}", authRequest.getUsername());
+                    logger.info("X-Username-filter"+username);
                     return ResponseEntity.ok(token);
                 })
                 .defaultIfEmpty(ResponseEntity.status(401).build())
