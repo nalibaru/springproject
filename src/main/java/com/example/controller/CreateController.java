@@ -3,7 +3,6 @@ package com.example.controller;
 
 import com.example.model.User;
 import com.example.service.CustomUserDetailsService;
-import com.example.springproject2.AuthRequest;
 import com.example.springproject2.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +57,7 @@ public class CreateController {
             @RequestHeader(name = "custom-api-header", required = false) String customHeader,
             @RequestHeader(name = "X-Username-filter", required = false) String usernamefilter,
             @RequestHeader(name = "Hello", required = false) String Hello,
+            @RequestHeader(name = "X-profilename", required = false) String profilename,
             @RequestHeader(name = "Authorization", required = false) String token) {
 
         Map<String, Object> response = new HashMap<>();
@@ -69,6 +69,7 @@ public class CreateController {
         response.put("custom-api-header", customHeader);
         response.put("X-Username-filter", usernamefilter);
         response.put("Hello", Hello);
+        response.put("X-profilename", profilename);
         return response;
     }
 
@@ -113,5 +114,27 @@ public class CreateController {
         return user;
     }
 
+    @PostMapping("/rewritereqid")
+    public User RewriteRequestFromCloud(@RequestParam(name="id") Long id) {
+        logger.info("Downstream param id "+id);
+        User user = customUserDetailsService.fetchUserBasedOnId(id);
+        return user;
+    }
+
+    @PostMapping("/fetchreqid")
+    public User fetchRequestFromCloud(@RequestParam(name="id") Long id,@RequestParam(name="username") String username) {
+        logger.info("Downstream param username "+username);
+        User user = customUserDetailsService.fetchUserBasedOnId(id);
+        return user;
+    }
+
+    @PostMapping("/removereqid")
+    public Map<String, Object> removeRequestFromCloud(@RequestParam(name="id", required=false) Long id,@RequestParam(name="username",required=false) String username) {
+        logger.info("Downstream param username "+username);
+        Map<String, Object> response = new HashMap<>();
+        response.put("id",id);
+        response.put("username",username);
+        return response;
+    }
 
 }

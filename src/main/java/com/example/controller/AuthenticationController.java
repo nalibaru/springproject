@@ -33,7 +33,7 @@ public class AuthenticationController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/authenticate")
-    public Mono<ResponseEntity<String>> authenticate(@RequestHeader(name="X-Username-filter") String username, @RequestBody AuthRequest authRequest) {
+    public Mono<ResponseEntity<String>> authenticate(@RequestHeader(name="X-Username-filter", required = false) String username, @RequestBody AuthRequest authRequest) {
         logger.info("Authentication request received for username: {}", authRequest.getUsername());
         return userDetailsService.findByUsername(authRequest.getUsername())
                 .doOnNext(userDetails -> logger.debug("User found in DB: {}", authRequest.getUsername()))

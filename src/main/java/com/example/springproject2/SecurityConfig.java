@@ -79,7 +79,7 @@ public class SecurityConfig {
     private AuthenticationWebFilter jwtAuthenticationWebFilter() {
         AuthenticationWebFilter jwtAuthenticationWebFilter = new AuthenticationWebFilter(jwtAuthenticationManager());
         jwtAuthenticationWebFilter.setServerAuthenticationConverter(new JwtAuthenticationConverter(jwtUtil));
-        jwtAuthenticationWebFilter.setRequiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers("/api/**"));
+        jwtAuthenticationWebFilter.setRequiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers("/api/**","/v1/**"));
         return jwtAuthenticationWebFilter;
     }
 }
